@@ -3,11 +3,12 @@ import requests
 import json
 import time
 import pandas as pd
+import csv
 
 
 class DialpadStats():
     """docstring for DialpadStats."""
-    
+
     # TODO move request logic into its own private method, raw request (_)
 
     def __init__(self, api_key, base_url):
@@ -51,7 +52,7 @@ class DialpadStats():
 
     def get_stats_download_url(self, request_id):
         url = urljoin(self.base_url, 'stats')
-        querystring = {"apikey": self.api_key}        
+        querystring = {"apikey": self.api_key}  
         headers = {"Accept": "application/json"}
 
         complete = False
@@ -87,10 +88,19 @@ class DialpadStats():
             return df
 
     def download_stats(self, download_url):
-        # TODO implement downloading the csv file
-        request = requests.get(download_url)
-        download_url_content = request.content
-        csv_file = open('dialpad_downloaded.csv', 'wb')
+        # TODO implement functionality to save to different directory instead of current working dir
+        # TODO implement functionality to save to S3 on AWS
 
-        csv_file.write(download_url_content)
-        csv_file.close()
+        # request = requests.get(download_url)
+        # download_url_content = request.content
+        # csv_file = open('dialpad_downloaded.csv', 'wb')
+
+        # csv_file.write(download_url_content)
+        # csv_file.close()
+
+        response = requests.get(download_url)
+
+        with open('outfile.csv', 'w') as f:  # TODO update file naming logic
+            writer = csv.writer(f)
+            for line in response.iter_lines():
+                writer.writerow(line.decode('utf-8').split(','))
