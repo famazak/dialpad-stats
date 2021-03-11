@@ -21,8 +21,8 @@ class DialpadStats():
 
         payload = {
             "timezone": timezone,
-            "days_ago_end": days_ago_end,
-            "days_ago_start": days_ago_start,
+            "days_ago_end": str(days_ago_end),
+            "days_ago_start": str(days_ago_start),
             "export_type": export_type,
             "stat_type": stat_type
         }
