@@ -88,3 +88,9 @@ class DialpadStats():
 
     def download_stats(self, download_url):
         # TODO implement downloading the csv file
+        request = requests.get(download_url)
+        download_url_content = request.content
+        csv_file = open('dialpad_downloaded.csv', 'wb')
+
+        csv_file.write(download_url_content)
+        csv_file.close()
