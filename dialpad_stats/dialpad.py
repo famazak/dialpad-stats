@@ -1,6 +1,90 @@
+from urllib.parse import urljoin
+import requests
+import json
+import time
+import pandas as pd
+
+
 class DialpadStats():
     """docstring for DialpadStats."""
+    
+    # TODO move request logic into its own private method, raw request (_)
+
     def __init__(self, api_key, base_url):
         self.api_key = api_key
         self.base_url = base_url
-        
+
+    def get_stats_export_id(self, timezone, days_ago_start=1, days_ago_end=1, export_type='record', stat_type='calls', **kwargs):
+        url = urljoin(self.base_url, 'stats')
+        querystring = {"apikey": self.api_key}
+
+        payload = {
+            "timezone": timezone,
+            "days_ago_end": days_ago_end,
+            "days_ago_start": days_ago_start,
+            "export_type": export_type,
+            "stat_type": stat_type
+        }
+        payload.update(kwargs)
+
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
+
+        response = requests.request("POST", url, json=payload, headers=headers, params=querystring)
+
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as eh:
+            return "An HTTP error has occurred: " + repr(eh)
+        except requests.exceptions.ConnectionError as ec:
+            return "An error connecting to the API has occurred: " + repr(ec)
+        except requests.exceptions.Timeout as et:
+            return "A timeout error has occurred: " + repr(et)
+        except requests.exceptions.RequestException as e:
+            return "An unknown error has occurred: " + repr(e)
+        else:
+            response_json = json.loads(response.text)
+
+        return response_json['request_id']
+
+    def get_stats_download_url(self, request_id):
+        url = urljoin(self.base_url, 'stats')
+        querystring = {"apikey": self.api_key}        
+        headers = {"Accept": "application/json"}
+
+        complete = False
+        sleep_timer = 5
+        while not complete:
+            response = requests.request("GET", url, headers=headers, params=querystring)
+            try:
+                response.raise_for_status()
+            except requests.exceptions.HTTPError as eh:
+                return "An HTTP error has occurred: " + repr(eh)
+            except requests.exceptions.ConnectionError as ec:
+                return "An error connecting to the API has occurred: " + repr(ec)
+            except requests.exceptions.Timeout as et:
+                return "A timeout error has occurred: " + repr(et)
+            except requests.exceptions.RequestException as e:
+                return "An unknown error has occurred: " + repr(e)
+            else:
+                response_json = json.loads(response.text)
+
+            if response_json['status'] != 'complete':
+                print(f"Request not yet complete -- sleeping for {sleep_timer} more seconds before checking status again")
+                time.sleep(sleep_timer)
+            else:
+                complete = True
+                return response_json['download_url']
+
+    def load_stats(self, download_url):
+        try:
+            df = pd.read_csv(download_url)
+        except pd.errors.EmptyDataError as e:
+            return "An empty data error has occurred: " + repr(e)
+        else:
+            return df
+
+    def download_stats(self, download_url):
+        # TODO implement downloading the csv file
