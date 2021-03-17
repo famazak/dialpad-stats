@@ -11,6 +11,10 @@ class DialpadStats():
 
     # TODO move request logic into its own private method, raw request (_)
 
+    def _url(self):
+        url = urljoin(self.base_url, 'stats')
+        return url
+
     def __init__(self, api_key, base_url):
         self.api_key = api_key
         self.base_url = base_url
