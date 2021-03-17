@@ -8,6 +8,9 @@ import csv
 
 class DialpadStats():
     """docstring for DialpadStats."""
+    def __init__(self, api_key, base_url):
+        self.api_key = api_key
+        self.base_url = base_url
 
     # TODO move request logic into its own private method, raw request (_)
 
@@ -15,29 +18,20 @@ class DialpadStats():
         url = urljoin(self.base_url, 'stats')
         return url
 
-    def __init__(self, api_key, base_url):
-        self.api_key = api_key
-        self.base_url = base_url
-
-    def get_stats_export_id(self, timezone, days_ago_start=1, days_ago_end=1, export_type='record', stat_type='calls', **kwargs):
-        url = urljoin(self.base_url, 'stats')
+    def _request(self, payload=None, method='POST', request_id=None):
         querystring = {"apikey": self.api_key}
-
-        payload = {
-            "timezone": timezone,
-            "days_ago_end": str(days_ago_end),
-            "days_ago_start": str(days_ago_start),
-            "export_type": export_type,
-            "stat_type": stat_type
-        }
-        payload.update(kwargs)
-
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json"
         }
 
-        response = requests.request("POST", url, json=payload, headers=headers, params=querystring)
+        if method == 'POST':
+            url = self._url()
+            response = requests.request(method, url, json=payload, headers=headers, params=querystring)
+
+        if method == 'GET':
+            url = urljoin(self._url(), request_id)
+            response = requests.request(method, url, headers=headers, params=querystring)
 
         try:
             response.raise_for_status()
@@ -52,29 +46,27 @@ class DialpadStats():
         else:
             response_json = json.loads(response.text)
 
+        return response_json
+
+    def get_stats_export_id(self, timezone, days_ago_start=1, days_ago_end=1, export_type='record', stat_type='calls', **kwargs):
+        payload = {
+            "timezone": timezone,
+            "days_ago_end": str(days_ago_end),
+            "days_ago_start": str(days_ago_start),
+            "export_type": export_type,
+            "stat_type": stat_type
+        }
+        payload.update(kwargs)
+
+        response_json = self._request(payload=payload)
+
         return response_json['request_id']
 
     def get_stats_download_url(self, request_id):
-        url = urljoin(self.base_url, 'stats')
-        querystring = {"apikey": self.api_key}  
-        headers = {"Accept": "application/json"}
-
         complete = False
         sleep_timer = 5
         while not complete:
-            response = requests.request("GET", url, headers=headers, params=querystring)
-            try:
-                response.raise_for_status()
-            except requests.exceptions.HTTPError as eh:
-                return "An HTTP error has occurred: " + repr(eh)
-            except requests.exceptions.ConnectionError as ec:
-                return "An error connecting to the API has occurred: " + repr(ec)
-            except requests.exceptions.Timeout as et:
-                return "A timeout error has occurred: " + repr(et)
-            except requests.exceptions.RequestException as e:
-                return "An unknown error has occurred: " + repr(e)
-            else:
-                response_json = json.loads(response.text)
+            response_json = self._request('GET', request_id)
 
             if response_json['status'] != 'complete':
                 print(f"Request not yet complete -- sleeping for {sleep_timer} more seconds before checking status again")
