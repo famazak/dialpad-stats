@@ -8,7 +8,8 @@ Dialpad Stats
 .. image:: https://travis-ci.org/famazak/dialpad-stats.png?branch=master
     :target: https://travis-ci.org/famazak/dialpad-stats
 
-Retrieve analytics data from the DialPad REST API
+Python package to retrieve analytics data from the Dialpad REST API, inspired by Dialpad's `Python SDK
+<https://github.com/dialpad/dialpad-python-sdk>`_.
 
 
 Features
