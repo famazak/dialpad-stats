@@ -32,9 +32,11 @@ setup(
     packages=[
         'dialpad_stats',
     ],
-    package_dir={'dialpad-stats': 'dialpad-stats'},
+    package_dir={'dialpad-stats': 'dialpad_stats'},
     include_package_data=True,
     install_requires=[
+        'requests',
+        'pandas'
     ],
     license='MIT',
     zip_safe=False,
