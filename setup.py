@@ -30,11 +30,13 @@ setup(
     author_email='fama.zachary@gmail.com',
     url='https://github.com/famazak/dialpad-stats',
     packages=[
-        'dialpad-stats',
+        'dialpad_stats',
     ],
-    package_dir={'dialpad-stats': 'dialpad-stats'},
+    package_dir={'dialpad-stats': 'dialpad_stats'},
     include_package_data=True,
     install_requires=[
+        'requests',
+        'pandas'
     ],
     license='MIT',
     zip_safe=False,
