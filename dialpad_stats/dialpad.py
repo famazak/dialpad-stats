@@ -58,7 +58,7 @@ class DialpadStats():
         }
         payload.update(kwargs)
 
-        response_json = self._request(payload=payload)
+        response_json = self._request(payload=payload, method='POST')
 
         return response_json['request_id']
 
@@ -66,7 +66,7 @@ class DialpadStats():
         complete = False
         sleep_timer = 5
         while not complete:
-            response_json = self._request('GET', request_id)
+            response_json = self._request(payload=None, method='GET', request_id=request_id)
 
             if response_json['status'] != 'complete':
                 print(f"Request not yet complete -- sleeping for {sleep_timer} more seconds before checking status again")
