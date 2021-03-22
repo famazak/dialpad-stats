@@ -52,7 +52,7 @@ class DialpadStats():
     #     return response_json
 
     def get_stats_export_id(self, timezone, days_ago_start=1, days_ago_end=1, export_type='record', stat_type='calls', **kwargs):
-        # refactoring this function to most POST request directly, instead of relying on requests.request abstraction
+        # refactoring this function to make POST request directly, instead of relying on requests.request abstraction
         url = self._url()
         payload = {
             "timezone": timezone,
@@ -69,10 +69,12 @@ class DialpadStats():
         return response_json['request_id']
 
     def get_stats_download_url(self, request_id):
+        url = urljoin(self._url(), request_id)
         complete = False
         sleep_timer = 5
         while not complete:
-            response_json = self._request(payload=None, method='GET', request_id=request_id)
+            # response_json = self._request(payload=None, method='GET', request_id=request_id)
+            response_json = requests.get(url, params={"apikey": self.api_key}, headers=self.c_headers)
 
             if response_json['status'] != 'complete':
                 print(f"Request not yet complete -- sleeping for {sleep_timer} more seconds before checking status again")
