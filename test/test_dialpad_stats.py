@@ -23,3 +23,22 @@ def test_get_stats_export_id(mock_get):
     assert_is_not_none(response_request_id)
     assert_true(mock_get.ok)
     assert 'request_id' in mock_get.return_value.json.return_value
+
+
+@patch('dialpad_stats.dialpad.requests.get')
+def test_get_stats_download_url(mock_get):
+    dp = DialpadStats('12345', 'https://dialpad.com/api/v2')
+
+    resp = {
+        "status": "complete",
+        "download_url": "12345abcde.csv"
+    }
+
+    mock_get.return_value = Mock(ok=True)
+    mock_get.return_value.json.return_value = resp
+
+    response_download_url = dp.get_stats_download_url('12345')
+
+    assert_is_not_none(response_download_url)
+    assert_true(mock_get.ok)
+    assert 'download_url' in mock_get.return_value.json.return_value
