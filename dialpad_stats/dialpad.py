@@ -64,9 +64,11 @@ class DialpadStats():
         payload.update(kwargs)
 
         # response_json = self._request(payload=payload, method='POST')
-        response_json = requests.post(url=url, data=payload, params={"apikey": self.api_key}, headers=self.c_headers)
+        response = requests.post(url=url, data=payload, params={"apikey": self.api_key}, headers=self.c_headers)
+        response_json = response.json()
 
         return response_json['request_id']
+        # return response_json
 
     def get_stats_download_url(self, request_id):
         url = urljoin(self._url(), request_id)
@@ -74,7 +76,8 @@ class DialpadStats():
         sleep_timer = 5
         while not complete:
             # response_json = self._request(payload=None, method='GET', request_id=request_id)
-            response_json = requests.get(url, params={"apikey": self.api_key}, headers=self.c_headers)
+            response = requests.get(url, params={"apikey": self.api_key}, headers=self.c_headers)
+            response_json = response.json()
 
             if response_json['status'] != 'complete':
                 print(f"Request not yet complete -- sleeping for {sleep_timer} more seconds before checking status again")
