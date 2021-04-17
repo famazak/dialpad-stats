@@ -5,6 +5,13 @@ Tests for `dialpad-stats` module.
 from unittest.mock import Mock, patch
 from nose.tools import assert_is_not_none, assert_true
 from dialpad_stats.dialpad import DialpadStats
+import pytest
+
+@pytest.fixture
+def expected_export_id_response():
+    return {
+        "request_id": "12345abcde"
+    }
 
 
 @patch('dialpad_stats.dialpad.requests.post')
