@@ -17,7 +17,7 @@ def expected_export_id_response():
 def expected_download_url_response():
     return {
         "status": "complete",
-        "download_url": ""
+        "download_url": "12345abcde.csv"
     }
 
 
@@ -42,15 +42,19 @@ def test_get_stats_export_id(mock_get, expected_export_id_response):
 def test_get_stats_download_url(mock_get, expected_download_url_response):
     dp = DialpadStats('12345', 'https://dialpad.com/api/v2')
 
-    resp = {
-        "status": "complete",
-        "download_url": "12345abcde.csv"
-    }
+    # resp = {
+    #     "status": "complete",
+    #     "download_url": "12345abcde.csv"
+    # }
 
     # mock_get.return_value = Mock(ok=True)
-    mock_get.return_value.json.return_value = resp
+    # mock_get.return_value.json.return_value = resp
+    mock_get.return_value = "12345abcde.csv"
+    expected_response = expected_download_url_response
 
     response_download_url = dp.get_stats_download_url('12345')
+
+    assert response_download_url == expected_response[download_url]
 
     # assert_is_not_none(response_download_url)
     # assert_true(mock_get.ok)
