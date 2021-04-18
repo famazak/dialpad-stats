@@ -31,6 +31,7 @@ def test_get_stats_export_id(mock_get, expected_export_id_response):
 
     response_request_id = dp.get_stats_export_id(timezone='America/Los_Angeles', days_ago_start=1, days_ago_end=1, export_type='record', stat_type='calls')
 
+    assert "request_id" in expected_response
     assert response_request_id == expected_response["request_id"]
 
     # assert_is_not_none(response_request_id)
@@ -54,6 +55,8 @@ def test_get_stats_download_url(mock_get, expected_download_url_response):
 
     response_download_url = dp.get_stats_download_url('12345')
 
+    assert expected_response["status"] == "complete"
+    assert "download_url" in expected_response
     assert response_download_url == expected_response["download_url"]
 
     # assert_is_not_none(response_download_url)
