@@ -24,15 +24,14 @@ def expected_download_url_response():
 @patch('dialpad_stats.dialpad.requests.post')
 def test_get_stats_export_id(mock_get, expected_export_id_response):
     dp = DialpadStats('12345', 'https://dialpad.com/api/v2')
-    
-    resp = {
-        "request_id": "12345abcde"
-    }
 
     # mock_get.return_value = Mock(ok=True)
-    mock_get.return_value.json.return_value = resp
+    mock_get.return_value = "12345abcde"
+    expected_response = expected_export_id_response
 
     response_request_id = dp.get_stats_export_id(timezone='America/Los_Angeles', days_ago_start=1, days_ago_end=1, export_type='record', stat_type='calls')
+
+    assert response_request_id == expected_response[request_id]
 
     # assert_is_not_none(response_request_id)
     # assert_true(mock_get.ok)
