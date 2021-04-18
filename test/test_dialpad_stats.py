@@ -13,6 +13,13 @@ def expected_export_id_response():
         "request_id": "12345abcde"
     }
 
+@pytest.fixture
+def expected_download_url_response():
+    return {
+        "status": "complete",
+        "download_url": ""
+    }
+
 
 @patch('dialpad_stats.dialpad.requests.post')
 def test_get_stats_export_id(mock_get):
